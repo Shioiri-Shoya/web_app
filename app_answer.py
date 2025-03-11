@@ -45,8 +45,10 @@ def fit_model_into_train(train, feature_cols, target_col):
 def predict_default_proba_in_test(test, feature_cols, model):
     pred_proba = model.predict_proba(test[feature_cols])[:, 1]
     result_df = pd.DataFrame({'id': test['id'], 'predicted_proba': pred_proba})
-    result_df['predicted_proba'] = result_df['predicted_proba'].apply(lambda x: f'{x*100:.2f}%')
-    return result_df.sort_values(by='predicted_proba', ascending=False)
+    result_df = result_df.sort_values(by='predicted_proba', ascending=False)
+    result_df['predicted_proba'] = result_df['predicted_proba'].apply(lambda x: f'{x*100:.2f}%') 
+    return result_df
+
 
 st.title('Default Probability Prediction')
 

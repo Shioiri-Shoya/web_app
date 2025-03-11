@@ -1,0 +1,21 @@
+id,contract_type,gender,has_own_car,has_own_reality,cnt_children,amt_income_total,amt_credit,amt_annuity,amt_goods_price,income_type,education_type,falimy_status,days_birth,days_employed,flag_mobile,flag_email,occupation_type,region_population,region_rating,organization_type,weekday_apply_start,hour_apply_start
+245799,Cash loans,M,N,Y,1,315000,545040,26640,450000,Working,Higher education,Married,12574,290,1,0,Drivers,0.011657,1,Transport: type 4,WEDNESDAY,14
+245800,Cash loans,F,N,Y,0,112500,539100,25933.5,450000,Pensioner,Secondary / secondary special,Married,20455,-365243,1,0,,0.01885,2,XNA,FRIDAY,11
+245801,Cash loans,F,N,Y,1,252000,562491,26194.5,454500,State servant,Higher education,Single / not married,17398,5864,1,1,Managers,0.031329,2,School,SUNDAY,12
+245803,Cash loans,F,N,Y,0,112500,728460,38938.5,675000,Working,Secondary / secondary special,Separated,23528,5238,1,0,,0.030755,2,Self-employed,MONDAY,11
+245805,Cash loans,F,N,N,0,360000,254700,17149.5,225000,Pensioner,Secondary / secondary special,Single / not married,24228,-365243,1,0,,0.014464,2,XNA,TUESDAY,9
+245806,Cash loans,F,N,N,0,173250,1024290,30078,855000,Working,Secondary / secondary special,Married,17113,4467,1,0,High skill tech staff,0.04622,1,Business Entity Type 3,MONDAY,14
+245808,Cash loans,M,Y,Y,0,270000,1006920,48573,900000,Commercial associate,Secondary / secondary special,Married,15566,3958,1,0,Laborers,0.031329,2,Housing,TUESDAY,14
+245809,Revolving loans,M,Y,Y,2,450000,180000,9000,180000,Working,Higher education,Married,10785,3204,1,0,,0.028663,2,Business Entity Type 3,TUESDAY,15
+245810,Revolving loans,F,N,Y,2,270000,382500,19125,382500,State servant,Higher education,Married,14102,2784,1,1,Core staff,0.003813,2,Government,TUESDAY,14
+245812,Cash loans,F,Y,N,0,117000,566055,16681.5,472500,Pensioner,Secondary / secondary special,Widow,22987,-365243,1,0,,0.010147,2,XNA,WEDNESDAY,9
+245813,Revolving loans,F,N,Y,1,135000,270000,13500,270000,Working,Higher education,Separated,13073,1102,1,0,,0.026392,2,Business Entity Type 3,TUESDAY,18
+245814,Cash loans,M,Y,N,0,180000,555273,14778,463500,Working,Secondary / secondary special,Married,17896,1509,1,0,,0.016612,2,Other,MONDAY,17
+245816,Cash loans,M,Y,N,0,270000,454500,23337,454500,Working,Secondary / secondary special,Married,14577,6212,1,0,,0.018209,3,Business Entity Type 2,TUESDAY,14
+245818,Cash loans,M,N,Y,0,157500,292500,12393,292500,Commercial associate,Higher education,Married,16762,187,1,0,Security staff,0.018634,2,Security,FRIDAY,13
+245821,Cash loans,F,N,N,2,157500,1260000,40774.5,1260000,State servant,Higher education,Married,11362,1591,1,0,Accountants,0.018209,3,Security Ministries,SATURDAY,9
+245822,Cash loans,M,Y,Y,0,135000,675000,21906,675000,Working,Secondary / secondary special,Civil marriage,15081,4297,1,0,Drivers,0.030755,2,Self-employed,TUESDAY,11
+245823,Cash loans,F,N,N,0,112500,225000,11074.5,225000,Working,Secondary / secondary special,Married,16626,3649,1,0,Medicine staff,0.014464,2,Medicine,TUESDAY,6
+245824,Cash loans,F,N,N,0,180000,253737,17086.5,229500,Working,Secondary / secondary special,Married,17376,4014,1,0,Laborers,0.032561,1,Business Entity Type 1,MONDAY,21
+245825,Revolving loans,M,N,Y,0,202500,450000,22500,450000,Commercial associate,Secondary / secondary special,Married,20525,1582,1,0,Drivers,0.019689,2,Transport: type 4,MONDAY,11
+245826,Cash loans,F,N,Y,0,225000,823621.5,44010,711000,Pensioner,Secondary / secondary special,Single / not married,21280,-365243,1,0,,0.0228,2,XNA,MONDAY,14

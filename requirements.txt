@@ -1,5 +1,5 @@
 pandas
 streamlit
-scikit-learn
-lightgbm
 category_encoders
+scikit-learn
+joblib

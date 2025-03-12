@@ -2,9 +2,8 @@ import os
 import pandas as pd
 import streamlit as st
 import category_encoders as ce
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-import lightgbm as lgb
+import joblib
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -36,10 +35,8 @@ def define_feature_target_col(train):
     feature_cols = [col for col in train.columns if col not in ['y', 'id']]
     return feature_cols, 'y'
 
-def fit_model_into_train(train, feature_cols, target_col):
-    X_train, X_valid, y_train, y_valid = train_test_split(train[feature_cols], train[target_col], test_size=0.2, random_state=0)
-    model = LogisticRegression()
-    model.fit(X_train, y_train)
+def load_model(model_path):
+    model = joblib.load(model_path)
     return model
 
 def predict_default_proba_in_test(test, feature_cols, model):
@@ -49,24 +46,50 @@ def predict_default_proba_in_test(test, feature_cols, model):
     result_df['predicted_proba'] = result_df['predicted_proba'].apply(lambda x: f'{x*100:.2f}%') 
     return result_df
 
-
+# Streamlit 部分
 st.title('Default Probability Prediction')
 
 if 'predicted_result' not in st.session_state:
     st.session_state.predicted_result = None
 
-if st.button('実行'):
+model = load_model('dataset/model.pkl')
+
+st.subheader('Batch')
+
+if st.button('バッチ予測を実行'):
     train = read_csv_data_as_pandas('dataset/train.csv')
     test = read_csv_data_as_pandas('dataset/test.csv')
     train_preprocessed, test_preprocessed = preprocess_train_test_set(train, test)
     feature_cols, target_col = define_feature_target_col(train_preprocessed)
-    model = fit_model_into_train(train_preprocessed, feature_cols, target_col)
     st.session_state.predicted_result = predict_default_proba_in_test(test_preprocessed, feature_cols, model)
     st.success('予測が完了しました！')
 
 if st.session_state.predicted_result is not None:
-    st.dataframe(st.session_state.predicted_result)
+    st.session_state.predicted_result['id'] = st.session_state.predicted_result['id'].astype(str)
+    st.dataframe(st.session_state.predicted_result[['id', 'predicted_proba']])
 
-if st.button('リセット'):
+# バッチ予測結果リセットボタン
+if st.button('バッチ予測結果リセット'):
     st.session_state.predicted_result = None
-    st.rerun()
+    st.rerun()  
+    
+# Single Prediction（個別予測）機能
+st.subheader('Single Prediction')
+
+# ID入力
+input_id = st.text_input('IDを入力してください')
+
+if input_id:
+    # predicted_resultがNoneでない場合のみ処理を進める
+    if st.session_state.predicted_result is not None:
+        # IDに対応する行をバッチ予測結果から取得
+        input_data = st.session_state.predicted_result[st.session_state.predicted_result['id'] == input_id]
+        
+        if not input_data.empty:
+            result = input_data['predicted_proba'].values[0]
+            st.write(f'ID {input_id} の予測結果: {result} の確率でデフォルト')
+        else:
+            st.warning('IDが見つかりませんでした')
+    else:
+        st.warning('バッチ予測結果がまだありません。')
+

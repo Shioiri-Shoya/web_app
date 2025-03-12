@@ -2,52 +2,71 @@ import os
 import pandas as pd
 import streamlit as st
 import category_encoders as ce
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-import lightgbm as lgb
+import joblib
 
 import warnings
 warnings.filterwarnings('ignore')
 
-# CSVファイルをPandasで読み込む関数を実装してください
+# CSVファイルをPandasで読み込む関数
 def read_csv_data_as_pandas(file_name):
     pass
 
-# Train, Testデータの前処理をする関数を実装してください
+# Train, Testデータの前処理をする関数
 def preprocess_train_test_set(train, test):
     pass
 
-# 前処理において、文字列型の特徴量をカテゴリカルエンコードする関数を実装してください
+# 文字列型の特徴量をカテゴリカルエンコードする関数
 def categorical_encode_string_type_features(train, test):
     pass
 
-# 前処理において、欠損値の存在する特徴量の値を補完する関数を実装してください
+# 欠損値の補完を行う関数
 def complete_missing_features_value(train, test):
     pass
 
-# 特徴量と目的変数を指定する関数を実装してください
+# 特徴量と目的変数を指定する関数
 def define_feature_target_col(train):
     pass
 
-# Trainデータでモデルを学習させる関数を実装してください
+# モデルを学習する関数
 def fit_model_into_train(train, feature_cols, target_col):
     pass
 
-# 学習したモデルをTestデータに適用し、予測確率を返却する関数を実装してください
+# 学習したモデルをTestデータに適用し、予測確率を返す関数
 def predict_default_proba_in_test(test, feature_cols, model):
     pass
 
-# Streamlitアプリのタイトルを設定してください
-pass
+# Streamlit 部分
+st.title('Default Probability Prediction')
 
-# セッションステートに予測結果を保存する変数を作成してください
-pass
+# セッションステートに予測結果を保存する変数
+if 'predicted_result' not in st.session_state:
+    st.session_state.predicted_result = None
 
-# 実行ボタンが押されたときに処理を実行する部分を実装してください
-pass
+# モデルのロード（保存されているモデルを使用）
+def load_model(model_path):
+    pass
 
-# 予測結果を表示する部分を実装してください
-pass
+model = load_model('dataset/model.pkl')
 
-# リセットボタンを実装し、予測結果を初期化する処理を追加してください
-pass
+# バッチ予測の処理
+st.subheader('Batch Prediction')
+
+if st.button('バッチ予測を実行'):
+    pass
+
+if st.session_state.predicted_result is not None:
+    pass
+
+# バッチ予測結果リセットボタン
+if st.button('バッチ予測結果リセット'):
+    pass
+
+# Single Prediction（個別予測）機能
+st.subheader('Single Prediction')
+
+# ID入力
+input_id = st.text_input('IDを入力してください')
+
+if input_id:
+    pass

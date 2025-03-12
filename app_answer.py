@@ -64,7 +64,7 @@ if 'predicted_result' not in st.session_state:
 model = load_model('dataset/model.pkl')
 
 # タブの作成
-tab1, tab2 = st.tabs(["バッチ予測", "個別予測"])
+tab1, tab2, tab3 = st.tabs(["バッチ予測", "個別予測", "特徴量の重要度分析"])
 
 # バッチ予測タブ
 with tab1:
@@ -171,3 +171,84 @@ with tab2:
 
     else:
         st.warning('特徴量を入力してください。')
+
+with tab3:
+    st.subheader('特徴量の重要度分析とカテゴリカル変数の解釈')
+
+    # セクション選択のラジオボタン
+    section = st.radio(
+        '表示したいセクションを選択してください:',
+        ('特徴量の重要度分析', 'カテゴリカル変数の解釈')
+    )
+    # モデルを使って特徴量の重要度を取得
+    feature_importances = model.coef_[0]  # LogisticRegression の係数
+    importance_df = pd.DataFrame({
+        'Feature': feature_cols,
+        'Importance': feature_importances
+    })
+
+    # 重要度を降順に並べ替え
+    importance_df = importance_df.sort_values(by='Importance', ascending=False)
+
+    # 「特徴量の重要度分析」セクション
+    if section == '特徴量の重要度分析':
+        st.write('### 特徴量の重要度:')
+
+        # 重要度のグラフ表示
+        st.bar_chart(importance_df.set_index('Feature')['Importance'])
+
+        # 重要度のテーブル表示
+        st.dataframe(importance_df)
+
+        # 解釈の説明
+        st.markdown("""
+        **解釈方法**：
+        - **正の係数**: 特徴量の値が増加すると、デフォルト確率が増加します。
+        - **負の係数**: 特徴量の値が増加すると、デフォルト確率が減少します。
+        - **カテゴリカル変数**: 基準カテゴリと比較して、他のカテゴリがターゲットに与える影響を示します。
+        """)
+
+    # 「カテゴリカル変数の解釈」セクション
+    elif section == 'カテゴリカル変数の解釈':
+        st.write('### カテゴリカル特徴量の解釈')
+
+        # カテゴリカル特徴量を抽出
+        categorical_features = importance_df[importance_df['Feature'].isin(train.select_dtypes(include=['object']).columns)]
+
+        # カテゴリカル特徴量を選択できるようにする
+        if len(categorical_features) > 0:
+            selected_feature = st.selectbox(
+                'カテゴリカル変数の特徴量を選んでください',
+                categorical_features['Feature'].unique()
+            )
+
+            # 選択した特徴量に基づいてそのカテゴリの値を取得
+            selected_column_values = train[selected_feature].dropna().unique()
+
+            # 基準カテゴリを選択するインターフェース
+            base_category = st.selectbox(
+                f'{selected_feature}の基準カテゴリを選んでください',
+                selected_column_values
+            )
+
+            # 対象カテゴリを選択するインターフェース
+            target_category = st.selectbox(
+                f'{selected_feature}の対象カテゴリを選んでください',
+                [cat for cat in selected_column_values if cat != base_category]  # 基準カテゴリ以外を選択肢にする
+            )
+
+            # 解釈の表示
+            selected_feature_coeff = importance_df[importance_df['Feature'] == selected_feature]['Importance'].values[0]
+
+            interpretation = ''
+            if selected_feature_coeff > 0:
+                interpretation = f"{base_category} と比較して、{target_category} が選ばれると、デフォルト確率が増加します。"
+            elif selected_feature_coeff < 0:
+                interpretation = f"{base_category} と比較して、{target_category} が選ばれると、デフォルト確率が減少します。"
+            else:
+                interpretation = f"{base_category} と {target_category} の間にターゲット変数への影響はありません。"
+
+            st.write(f"分析する特徴量: {selected_feature}")
+            st.write(f"基準カテゴリ: {base_category}")
+            st.write(f"対象カテゴリ: {target_category}")
+            st.write(f"⇒ {interpretation}")

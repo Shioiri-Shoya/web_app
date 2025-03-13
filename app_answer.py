@@ -3,7 +3,6 @@ import pandas as pd
 import streamlit as st
 import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
-import japanize_matplotlib
 import matplotlib.pyplot as plt
 import joblib
 
@@ -200,17 +199,20 @@ with tab3:
     if section == '特徴量の重要度分析':
         st.write('### 特徴量の重要度')
 
-        # 重要度を降順に並べ替えてグラフ表示
-        # st.bar_chart(importance_df.sort_values(by='Importance', ascending=False).set_index('Feature_JP')['Importance'])
-        # => st.bar_chartでは上手く降順に表示できない。
+        import altair as alt
 
-        # グラフ作成
-        fig, ax = plt.subplots(figsize=(10, 6))
-        ax.barh(importance_df['Feature_JP'], importance_df['Importance'], color='skyblue')
-        ax.set_xlabel('Importance')
-        ax.set_title('Feature Importance')
-        # グラフの表示
-        st.pyplot(fig)
+        # Altairを使って降順の棒グラフを作成
+        chart = alt.Chart(importance_df).mark_bar().encode(
+            x='Importance',
+            y=alt.Y('Feature_JP', sort='-x', title=None),  
+        ).properties(
+            width=600,
+            height=400
+        ).configure_axis(
+            labelFontSize=7,  # ラベルの文字サイズを小さく設定(すべて表示させるため)
+        )
+        # グラフを表示
+        st.altair_chart(chart, use_container_width=True)
 
         # 重要度のテーブル表示
         st.dataframe(importance_df[['Feature_JP', 'Importance']]) 

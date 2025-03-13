@@ -4,69 +4,60 @@ import streamlit as st
 import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
 import joblib
+import altair as alt
 
 import warnings
 warnings.filterwarnings('ignore')
 
-# CSVファイルをPandasで読み込む関数
+# CSVデータを読み込む関数
 def read_csv_data_as_pandas(file_name):
     pass
 
-# Train, Testデータの前処理をする関数
+# トレーニングとテストセットの前処理
 def preprocess_train_test_set(train, test):
     pass
 
-# 文字列型の特徴量をカテゴリカルエンコードする関数
+# カテゴリデータのエンコード
 def categorical_encode_string_type_features(train, test):
     pass
 
-# 欠損値の補完を行う関数
+# 欠損値を中央値で埋める
 def complete_missing_features_value(train, test):
     pass
 
-# 特徴量と目的変数を指定する関数
+# 特徴量とターゲットの列を定義
 def define_feature_target_col(train):
     pass
 
-# モデルを学習する関数
-def fit_model_into_train(train, feature_cols, target_col):
+# モデルをロードする
+def load_model(model_path):
     pass
 
-# 学習したモデルをTestデータに適用し、予測確率を返す関数
+# テストデータでデフォルト確率を予測
 def predict_default_proba_in_test(test, feature_cols, model):
     pass
 
 # Streamlit 部分
 st.title('Default Probability Prediction')
 
-# セッションステートに予測結果を保存する変数
+# セッション状態の初期化
 if 'predicted_result' not in st.session_state:
     st.session_state.predicted_result = None
 
-# モデルのロード（保存されているモデルを使用）
-def load_model(model_path):
-    pass
-
+# モデルのロード
 model = load_model('dataset/model.pkl')
 
-# バッチ予測の処理
-st.subheader('Batch Prediction')
+# タブの作成
+tab1, tab2, tab3 = st.tabs(["バッチ予測", "個別予測", "特徴量の重要度分析"])
 
-if st.button('バッチ予測を実行'):
+# バッチ予測タブ
+with tab1:
     pass
 
-if st.session_state.predicted_result is not None:
+# 個別予測タブ
+with tab2:
     pass
 
-# バッチ予測結果リセットボタン
-if st.button('バッチ予測結果リセット'):
-    pass
-
-# Single Prediction（個別予測）機能
-st.subheader('Single Prediction')
-
-# ID入力
-input_id = st.text_input('IDを入力してください')
-
-if input_id:
+# 特徴量の重要度分析タブ
+with tab3:
     pass

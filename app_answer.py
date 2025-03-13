@@ -6,7 +6,7 @@ from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 import joblib
 import altair as alt
-
+from sklearn.preprocessing import StandardScaler
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -191,8 +191,12 @@ with tab3:
         'Importance': feature_importances
     })
 
+    # 特徴量の重要度を標準化
+    scaler = StandardScaler()
+    importance_df['Standardized_Importance'] = scaler.fit_transform(importance_df[['Importance']])
+
     # 重要度を降順に並べ替え
-    importance_df = importance_df.sort_values(by='Importance', ascending=False)
+    importance_df = importance_df.sort_values(by='Standardized_Importance', ascending=False)
 
     # 日本語ラベル辞書を使って日本語ラベルを付ける
     importance_df['Feature_JP'] = importance_df['Feature'].map(feature_labels)
@@ -203,7 +207,7 @@ with tab3:
 
         # Altairを使って降順の棒グラフを作成
         chart = alt.Chart(importance_df).mark_bar().encode(
-            x='Importance',
+            x='Standardized_Importance',
             y=alt.Y('Feature_JP', sort='-x', title=None),  
         ).properties(
             width=600,
@@ -215,14 +219,14 @@ with tab3:
         st.altair_chart(chart, use_container_width=True)
 
         # 重要度のテーブル表示
-        st.dataframe(importance_df[['Feature_JP', 'Importance']]) 
+        st.dataframe(importance_df[['Feature_JP', 'Standardized_Importance']]) 
 
         # 解釈の説明
-        st.markdown("""
-        **解釈方法**：
-        - **正の係数**: 特徴量の値が増加すると、デフォルト確率が増加します。
-        - **負の係数**: 特徴量の値が増加すると、デフォルト確率が減少します。
-        - **カテゴリカル変数**: 基準カテゴリと比較して、他のカテゴリがターゲットに与える影響を示します。
+        st.markdown(""" 
+        **解釈方法**： 
+        - **正の係数**: 特徴量の値が増加すると、デフォルト確率が増加します。 
+        - **負の係数**: 特徴量の値が増加すると、デフォルト確率が減少します。 
+        - **カテゴリカル変数**: 基準カテゴリと比較して、他のカテゴリがターゲットに与える影響を示します。 
         """)
 
     # 「カテゴリカル変数の解釈」セクション
@@ -268,7 +272,7 @@ with tab3:
             base_category_coeff = model.coef_[0][base_category_index]  # 基準カテゴリの係数
             target_category_coeff = model.coef_[0][target_category_index]  # 対象カテゴリの係数
 
-             # 解釈の表示
+            # 解釈の表示
             interpretation = ''
             if target_category_coeff > base_category_coeff:
                 interpretation = f"{base_category} と比較して、{target_category} が選ばれると、デフォルト確率が増加します。"

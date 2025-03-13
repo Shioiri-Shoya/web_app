@@ -5,6 +5,8 @@ import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 import joblib
+import altair as alt
+
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -179,7 +181,7 @@ with tab3:
 
     # セクション選択のラジオボタン
     section = st.radio(
-        '表示したいセクションを選択してください:',
+        '表示したいセクションを選択してください',
         ('特徴量の重要度分析', 'カテゴリカル変数の解釈')
     )
     # モデルを使って特徴量の重要度を取得
@@ -198,8 +200,6 @@ with tab3:
     # 「特徴量の重要度分析」セクション
     if section == '特徴量の重要度分析':
         st.write('### 特徴量の重要度')
-
-        import altair as alt
 
         # Altairを使って降順の棒グラフを作成
         chart = alt.Chart(importance_df).mark_bar().encode(

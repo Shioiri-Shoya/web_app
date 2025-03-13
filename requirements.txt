@@ -1,5 +1,7 @@
 pandas
 streamlit
-category_encoders
+category-encoders
 scikit-learn
+japanize-matplotlib
+matplotlib
 joblib

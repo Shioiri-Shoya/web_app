@@ -3,6 +3,8 @@ import pandas as pd
 import streamlit as st
 import category_encoders as ce
 from sklearn.linear_model import LogisticRegression
+import japanize_matplotlib
+import matplotlib.pyplot as plt
 import joblib
 
 import warnings
@@ -100,7 +102,7 @@ feature_labels = {
     'amt_goods_price': '商品の価格',
     'income_type': '収入の種類',
     'education_type': '教育の種類',
-    'family_status': '家族の状態',
+    'falimy_status': '家族の状態',
     'days_birth': '年齢（誕生日からの日数）',
     'days_employed': '就業日数',
     'flag_mobile': 'モバイルを持っているか',
@@ -113,7 +115,6 @@ feature_labels = {
     'hour_apply_start': '申請開始時間'
 }
 
-# 個別予測タブ
 with tab2:
     st.subheader('個別予測')
 
@@ -134,7 +135,9 @@ with tab2:
         if len(unique_values) < 10:  # 値の種類が少ない場合、選択肢として表示
             input_data[feature] = st.selectbox(f'{label}を選択してください', options=unique_values)
         else:  # 数値的な特徴量の場合、テキスト入力を使用
-            input_data[feature] = st.text_input(f'{label}の値を入力してください')
+            # 数値型特徴量のデフォルト値として、中央値を設定
+            median_value = train[feature].median() if train[feature].dtype in ['int64', 'float64'] else ''
+            input_data[feature] = st.text_input(f'{label}の値を入力してください', value=median_value)
 
     # 最頻値と平均値で埋める処理
     for feature in feature_cols:
@@ -142,8 +145,8 @@ with tab2:
             most_frequent_value = train[feature].mode()[0]  # 最頻値を取得
             input_data[feature] = most_frequent_value  # 最頻値で埋める
         elif isinstance(input_data[feature], (int, float)) and input_data[feature] == '':  # 数値型の特徴量
-            mean_value = train[feature].mean()  # 平均値を取得
-            input_data[feature] = mean_value  # 平均値で埋める
+            median = train[feature].median()  # 平均値を取得
+            input_data[feature] = median  # 平均値で埋める
 
     # 予測を実行するボタンを追加
     if st.button('予測を実行'):
@@ -172,7 +175,7 @@ with tab2:
     else:
         st.warning('特徴量を入力してください。')
 
-with tab3:
+with tab3: 
     st.subheader('特徴量の重要度分析とカテゴリカル変数の解釈')
 
     # セクション選択のラジオボタン
@@ -190,15 +193,27 @@ with tab3:
     # 重要度を降順に並べ替え
     importance_df = importance_df.sort_values(by='Importance', ascending=False)
 
+    # 日本語ラベル辞書を使って日本語ラベルを付ける
+    importance_df['Feature_JP'] = importance_df['Feature'].map(feature_labels)
+
     # 「特徴量の重要度分析」セクション
     if section == '特徴量の重要度分析':
-        st.write('### 特徴量の重要度:')
+        st.write('### 特徴量の重要度')
 
-        # 重要度のグラフ表示
-        st.bar_chart(importance_df.set_index('Feature')['Importance'])
+        # 重要度を降順に並べ替えてグラフ表示
+        # st.bar_chart(importance_df.sort_values(by='Importance', ascending=False).set_index('Feature_JP')['Importance'])
+        # => st.bar_chartでは上手く降順に表示できない。
+
+        # グラフ作成
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.barh(importance_df['Feature_JP'], importance_df['Importance'], color='skyblue')
+        ax.set_xlabel('Importance')
+        ax.set_title('Feature Importance')
+        # グラフの表示
+        st.pyplot(fig)
 
         # 重要度のテーブル表示
-        st.dataframe(importance_df)
+        st.dataframe(importance_df[['Feature_JP', 'Importance']]) 
 
         # 解釈の説明
         st.markdown("""
@@ -219,11 +234,14 @@ with tab3:
         if len(categorical_features) > 0:
             selected_feature = st.selectbox(
                 'カテゴリカル変数の特徴量を選んでください',
-                categorical_features['Feature'].unique()
+                categorical_features['Feature_JP'].unique()  
             )
 
+            # 日本語ラベルを英語に変換
+            selected_feature_english = [key for key, value in feature_labels.items() if value == selected_feature][0]
+
             # 選択した特徴量に基づいてそのカテゴリの値を取得
-            selected_column_values = train[selected_feature].dropna().unique()
+            selected_column_values = train[selected_feature_english].dropna().unique()
 
             # 基準カテゴリを選択するインターフェース
             base_category = st.selectbox(
@@ -237,13 +255,22 @@ with tab3:
                 [cat for cat in selected_column_values if cat != base_category]  # 基準カテゴリ以外を選択肢にする
             )
 
-            # 解釈の表示
-            selected_feature_coeff = importance_df[importance_df['Feature'] == selected_feature]['Importance'].values[0]
+            # 特徴量のダミー変数の係数を取得
+            # ここで基準カテゴリを0として他のカテゴリとの相対的な係数を取得
+            # モデルの coef_ に基づき、基準カテゴリは除外されることを前提とする
 
+            base_category_index = list(selected_column_values).index(base_category)  # 基準カテゴリのインデックス
+            target_category_index = list(selected_column_values).index(target_category)  # 対象カテゴリのインデックス
+
+            # 特徴量の係数を取得（model.coef_ から基準カテゴリを除いた係数）
+            base_category_coeff = model.coef_[0][base_category_index]  # 基準カテゴリの係数
+            target_category_coeff = model.coef_[0][target_category_index]  # 対象カテゴリの係数
+
+             # 解釈の表示
             interpretation = ''
-            if selected_feature_coeff > 0:
+            if target_category_coeff > base_category_coeff:
                 interpretation = f"{base_category} と比較して、{target_category} が選ばれると、デフォルト確率が増加します。"
-            elif selected_feature_coeff < 0:
+            elif target_category_coeff < base_category_coeff:
                 interpretation = f"{base_category} と比較して、{target_category} が選ばれると、デフォルト確率が減少します。"
             else:
                 interpretation = f"{base_category} と {target_category} の間にターゲット変数への影響はありません。"

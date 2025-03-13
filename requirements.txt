@@ -4,3 +4,4 @@ category-encoders
 scikit-learn
 matplotlib
 joblib
+altair
